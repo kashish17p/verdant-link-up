@@ -226,6 +226,7 @@ export type Database = {
           price: number
           stock: number
           updated_at: string
+          vendor_id: string | null
         }
         Insert: {
           care_instructions?: string | null
@@ -241,6 +242,7 @@ export type Database = {
           price: number
           stock?: number
           updated_at?: string
+          vendor_id?: string | null
         }
         Update: {
           care_instructions?: string | null
@@ -256,6 +258,7 @@ export type Database = {
           price?: number
           stock?: number
           updated_at?: string
+          vendor_id?: string | null
         }
         Relationships: [
           {
