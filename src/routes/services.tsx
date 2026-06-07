@@ -32,16 +32,9 @@ function ServicesPage() {
     queryFn: async () => (await supabase.from("gardener_services").select("*").eq("is_active", true)).data ?? [],
   });
 
-  // Demo services if none seeded
-  const demoServices = services.length ? services : [
-    { id: "demo-1", title: "Home Gardening Visit", description: "Planting, soil prep & care for your garden.", price: 599, duration_minutes: 90 },
-    { id: "demo-2", title: "Lawn Maintenance", description: "Mowing, edging and seasonal lawn care.", price: 799, duration_minutes: 120 },
-    { id: "demo-3", title: "Plant Care & Pruning", description: "Pruning, repotting and plant health checks.", price: 449, duration_minutes: 60 },
-  ];
-
   const handleBook = async () => {
     if (!user) { navigate({ to: "/auth" }); return; }
-    if (!selected || selected.id?.startsWith("demo")) { toast.error("Choose a real service (admin needs to add gardeners)."); return; }
+    if (!selected) { toast.error("Choose a service"); return; }
     if (!date) { toast.error("Pick a date & time"); return; }
     setSubmitting(true);
     const { error } = await supabase.from("bookings").insert({
@@ -66,7 +59,7 @@ function ServicesPage() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-5 mt-10">
-          {demoServices.map((s: any, i: number) => {
+          {services.map((s: any, i: number) => {
             const Icon = [Sprout, TreePine, Scissors][i % 3];
             const isSelected = selected?.id === s.id;
             return (
@@ -74,13 +67,22 @@ function ServicesPage() {
                 <Icon className="h-7 w-7 text-primary" />
                 <h3 className="font-display text-xl mt-3">{s.title}</h3>
                 <p className="text-sm text-muted-foreground mt-1">{s.description}</p>
-                <div className="mt-4 flex justify-between items-center">
+                {s.gardener_name && (
+                  <p className="text-xs mt-3 text-foreground/70">
+                    by <span className="font-medium">{s.gardener_name}</span>
+                    {s.rating && <span className="ml-2">★ {Number(s.rating).toFixed(1)}</span>}
+                  </p>
+                )}
+                <div className="mt-3 flex justify-between items-center">
                   <span className="font-display text-lg">₹{Number(s.price).toFixed(0)}</span>
                   <span className="text-xs text-muted-foreground">{s.duration_minutes} min</span>
                 </div>
               </button>
             );
           })}
+          {services.length === 0 && (
+            <p className="text-muted-foreground col-span-3 py-10 text-center">No services available yet.</p>
+          )}
         </div>
 
         {selected && (

@@ -94,9 +94,11 @@ export type Database = {
           description: string | null
           duration_minutes: number
           gardener_id: string
+          gardener_name: string | null
           id: string
           is_active: boolean
           price: number
+          rating: number | null
           title: string
           updated_at: string
         }
@@ -105,9 +107,11 @@ export type Database = {
           description?: string | null
           duration_minutes?: number
           gardener_id: string
+          gardener_name?: string | null
           id?: string
           is_active?: boolean
           price: number
+          rating?: number | null
           title: string
           updated_at?: string
         }
@@ -116,9 +120,11 @@ export type Database = {
           description?: string | null
           duration_minutes?: number
           gardener_id?: string
+          gardener_name?: string | null
           id?: string
           is_active?: boolean
           price?: number
+          rating?: number | null
           title?: string
           updated_at?: string
         }
