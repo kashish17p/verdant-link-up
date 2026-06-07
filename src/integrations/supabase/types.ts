@@ -226,6 +226,7 @@ export type Database = {
           price: number
           stock: number
           updated_at: string
+          vendor_id: string | null
         }
         Insert: {
           care_instructions?: string | null
@@ -241,6 +242,7 @@ export type Database = {
           price: number
           stock?: number
           updated_at?: string
+          vendor_id?: string | null
         }
         Update: {
           care_instructions?: string | null
@@ -256,6 +258,7 @@ export type Database = {
           price?: number
           stock?: number
           updated_at?: string
+          vendor_id?: string | null
         }
         Relationships: [
           {
@@ -329,7 +332,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "gardener" | "customer"
+      app_role: "admin" | "gardener" | "customer" | "vendor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -457,7 +460,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "gardener", "customer"],
+      app_role: ["admin", "gardener", "customer", "vendor"],
     },
   },
 } as const
