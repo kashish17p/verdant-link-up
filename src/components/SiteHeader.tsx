@@ -3,11 +3,13 @@ import { Leaf, ShoppingCart, User as UserIcon, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { useAuth } from "@/hooks/use-auth";
+import { useRoles } from "@/hooks/use-role";
 import { supabase } from "@/integrations/supabase/client";
 
 export function SiteHeader() {
   const { count } = useCart();
   const { user } = useAuth();
+  const { isAdmin, isVendor } = useRoles();
   const navigate = useNavigate();
 
   const signOut = async () => {
@@ -28,6 +30,8 @@ export function SiteHeader() {
           <Link to="/products" className="text-foreground/80 hover:text-foreground" activeProps={{ className: "text-foreground font-medium" }}>Shop Plants</Link>
           <Link to="/services" className="text-foreground/80 hover:text-foreground" activeProps={{ className: "text-foreground font-medium" }}>Gardeners</Link>
           {user && <Link to="/dashboard" className="text-foreground/80 hover:text-foreground" activeProps={{ className: "text-foreground font-medium" }}>Dashboard</Link>}
+          {(isVendor || isAdmin) && <Link to="/vendor" className="text-foreground/80 hover:text-foreground" activeProps={{ className: "text-foreground font-medium" }}>Vendor</Link>}
+          {isAdmin && <Link to="/admin" className="text-foreground/80 hover:text-foreground" activeProps={{ className: "text-foreground font-medium" }}>Admin</Link>}
         </nav>
         <div className="flex items-center gap-2">
           <Link to="/cart">
