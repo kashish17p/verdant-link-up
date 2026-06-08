@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VendorApplyRouteImport } from './routes/vendor-apply'
 import { Route as VendorRouteImport } from './routes/vendor'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ProductsRouteImport } from './routes/products'
@@ -20,6 +21,11 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductsIdRouteImport } from './routes/products.$id'
 
+const VendorApplyRoute = VendorApplyRouteImport.update({
+  id: '/vendor-apply',
+  path: '/vendor-apply',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VendorRoute = VendorRouteImport.update({
   id: '/vendor',
   path: '/vendor',
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/products': typeof ProductsRouteWithChildren
   '/services': typeof ServicesRoute
   '/vendor': typeof VendorRoute
+  '/vendor-apply': typeof VendorApplyRoute
   '/products/$id': typeof ProductsIdRoute
 }
 export interface FileRoutesByTo {
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/products': typeof ProductsRouteWithChildren
   '/services': typeof ServicesRoute
   '/vendor': typeof VendorRoute
+  '/vendor-apply': typeof VendorApplyRoute
   '/products/$id': typeof ProductsIdRoute
 }
 export interface FileRoutesById {
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/products': typeof ProductsRouteWithChildren
   '/services': typeof ServicesRoute
   '/vendor': typeof VendorRoute
+  '/vendor-apply': typeof VendorApplyRoute
   '/products/$id': typeof ProductsIdRoute
 }
 export interface FileRouteTypes {
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/services'
     | '/vendor'
+    | '/vendor-apply'
     | '/products/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/services'
     | '/vendor'
+    | '/vendor-apply'
     | '/products/$id'
   id:
     | '__root__'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/products'
     | '/services'
     | '/vendor'
+    | '/vendor-apply'
     | '/products/$id'
   fileRoutesById: FileRoutesById
 }
@@ -157,10 +169,18 @@ export interface RootRouteChildren {
   ProductsRoute: typeof ProductsRouteWithChildren
   ServicesRoute: typeof ServicesRoute
   VendorRoute: typeof VendorRoute
+  VendorApplyRoute: typeof VendorApplyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/vendor-apply': {
+      id: '/vendor-apply'
+      path: '/vendor-apply'
+      fullPath: '/vendor-apply'
+      preLoaderRoute: typeof VendorApplyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/vendor': {
       id: '/vendor'
       path: '/vendor'
@@ -256,6 +276,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProductsRoute: ProductsRouteWithChildren,
   ServicesRoute: ServicesRoute,
   VendorRoute: VendorRoute,
+  VendorApplyRoute: VendorApplyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
