@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Trash2, Plus } from "lucide-react";
+import { logAudit } from "@/lib/audit";
 
 export const Route = createFileRoute("/vendor")({ component: VendorPanel });
 
@@ -47,7 +48,7 @@ function VendorPanel() {
     e.preventDefault();
     if (!form.name || !form.price) return toast.error("Name and price required");
     setSaving(true);
-    const { error } = await supabase.from("products").insert({
+    const { data, error } = await supabase.from("products").insert({
       name: form.name,
       description: form.description || null,
       price: Number(form.price),
@@ -58,10 +59,11 @@ function VendorPanel() {
       care_instructions: form.care_instructions || null,
       vendor_id: user!.id,
       is_active: true,
-    });
+    }).select().single();
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Product added");
+    await logAudit({ actorId: user!.id, actorRole: "vendor", action: "product.created", entityType: "product", entityId: data.id, metadata: { name: form.name, price: Number(form.price) } });
     setForm(empty);
     qc.invalidateQueries({ queryKey: ["vendor-products"] });
   };
@@ -70,12 +72,14 @@ function VendorPanel() {
     const { error } = await supabase.from("products").delete().eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Deleted");
+    await logAudit({ actorId: user!.id, actorRole: "vendor", action: "product.deleted", entityType: "product", entityId: id });
     qc.invalidateQueries({ queryKey: ["vendor-products"] });
   };
 
   const toggle = async (id: string, current: boolean) => {
     const { error } = await supabase.from("products").update({ is_active: !current }).eq("id", id);
     if (error) return toast.error(error.message);
+    await logAudit({ actorId: user!.id, actorRole: "vendor", action: current ? "product.hidden" : "product.shown", entityType: "product", entityId: id });
     qc.invalidateQueries({ queryKey: ["vendor-products"] });
   };
 
