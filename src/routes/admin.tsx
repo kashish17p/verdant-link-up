@@ -273,3 +273,32 @@ function UserRow({ u, onGrant, onRevoke }: { u: any; onGrant: (id: string, r: an
     </div>
   );
 }
+
+function AppRow({ app, onReview }: { app: any; onReview: (a: any, d: "approved" | "rejected", notes: string) => void }) {
+  const [notes, setNotes] = useState(app.admin_notes ?? "");
+  const pending = app.status === "pending";
+  return (
+    <div className="p-4 rounded-2xl border bg-card space-y-2">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-medium truncate">{app.business_name}</p>
+          <p className="text-xs text-muted-foreground">{new Date(app.created_at).toLocaleString()} · user {app.user_id.slice(0, 8)}</p>
+        </div>
+        <Badge variant={app.status === "approved" ? "default" : app.status === "rejected" ? "destructive" : "secondary"}>{app.status}</Badge>
+      </div>
+      {app.description && <p className="text-sm">{app.description}</p>}
+      <p className="text-xs text-muted-foreground">{[app.contact_email, app.contact_phone, app.address].filter(Boolean).join(" · ")}</p>
+      {pending ? (
+        <div className="flex flex-col md:flex-row gap-2">
+          <Textarea placeholder="Notes (optional)" value={notes} onChange={(e) => setNotes(e.target.value)} className="min-h-10" />
+          <div className="flex gap-2">
+            <Button size="sm" onClick={() => onReview(app, "approved", notes)}>Approve</Button>
+            <Button size="sm" variant="destructive" onClick={() => onReview(app, "rejected", notes)}>Reject</Button>
+          </div>
+        </div>
+      ) : (
+        app.admin_notes && <p className="text-xs"><span className="text-muted-foreground">Notes:</span> {app.admin_notes}</p>
+      )}
+    </div>
+  );
+}
