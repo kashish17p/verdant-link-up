@@ -15,7 +15,7 @@ export async function logAudit(params: {
       action: params.action,
       entity_type: params.entityType ?? null,
       entity_id: params.entityId ?? null,
-      metadata: params.metadata ?? null,
+      metadata: (params.metadata ?? null) as any,
     });
   } catch (e) {
     // non-fatal

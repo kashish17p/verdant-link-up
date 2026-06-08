@@ -31,6 +31,7 @@ export function SiteHeader() {
           <Link to="/services" className="text-foreground/80 hover:text-foreground" activeProps={{ className: "text-foreground font-medium" }}>Gardeners</Link>
           {user && <Link to="/dashboard" className="text-foreground/80 hover:text-foreground" activeProps={{ className: "text-foreground font-medium" }}>Dashboard</Link>}
           {(isVendor || isAdmin) && <Link to="/vendor" className="text-foreground/80 hover:text-foreground" activeProps={{ className: "text-foreground font-medium" }}>Vendor</Link>}
+          {user && !isVendor && !isAdmin && <Link to="/vendor-apply" className="text-foreground/80 hover:text-foreground" activeProps={{ className: "text-foreground font-medium" }}>Sell with us</Link>}
           {isAdmin && <Link to="/admin" className="text-foreground/80 hover:text-foreground" activeProps={{ className: "text-foreground font-medium" }}>Admin</Link>}
         </nav>
         <div className="flex items-center gap-2">
