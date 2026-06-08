@@ -155,11 +155,13 @@ function AdminPanel() {
         <p className="text-muted-foreground mt-1">Manage products, orders, bookings and users.</p>
 
         <Tabs defaultValue="orders" className="mt-8">
-          <TabsList>
+          <TabsList className="flex-wrap h-auto">
             <TabsTrigger value="orders">Orders ({orders.length})</TabsTrigger>
             <TabsTrigger value="bookings">Bookings ({bookings.length})</TabsTrigger>
             <TabsTrigger value="products">Products ({products.length})</TabsTrigger>
             <TabsTrigger value="users">Users ({users.length})</TabsTrigger>
+            <TabsTrigger value="applications">Applications ({apps.filter((a: any) => a.status === "pending").length})</TabsTrigger>
+            <TabsTrigger value="audit">Audit logs</TabsTrigger>
           </TabsList>
 
           <TabsContent value="orders" className="mt-6 space-y-3">
