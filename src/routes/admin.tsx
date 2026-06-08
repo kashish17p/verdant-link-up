@@ -218,6 +218,25 @@ function AdminPanel() {
           <TabsContent value="users" className="mt-6 space-y-3">
             {users.map((u: any) => <UserRow key={u.id} u={u} onGrant={grantRole} onRevoke={revokeRole} />)}
           </TabsContent>
+
+          <TabsContent value="applications" className="mt-6 space-y-3">
+            {apps.length === 0 && <p className="text-muted-foreground">No applications.</p>}
+            {apps.map((a: any) => <AppRow key={a.id} app={a} onReview={reviewApp} />)}
+          </TabsContent>
+
+          <TabsContent value="audit" className="mt-6 space-y-2">
+            {logs.length === 0 && <p className="text-muted-foreground">No activity yet.</p>}
+            {logs.map((l: any) => (
+              <div key={l.id} className="p-3 rounded-xl border bg-card text-sm flex flex-col md:flex-row md:items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="font-mono text-xs">{l.action}</p>
+                  <p className="text-xs text-muted-foreground">{new Date(l.created_at).toLocaleString()} · {l.actor_role ?? "—"} · {l.actor_id?.slice(0, 8) ?? "system"}</p>
+                  {l.entity_type && <p className="text-xs text-muted-foreground">{l.entity_type}:{l.entity_id?.slice(0, 8)}</p>}
+                </div>
+                {l.metadata && <pre className="text-[10px] bg-muted px-2 py-1 rounded max-w-md overflow-auto">{JSON.stringify(l.metadata)}</pre>}
+              </div>
+            ))}
+          </TabsContent>
         </Tabs>
       </main>
       <SiteFooter />
