@@ -58,10 +58,22 @@ function AdminPanel() {
     },
   });
 
+  const { data: apps = [] } = useQuery({
+    queryKey: ["admin-vendor-apps"],
+    enabled: isAdmin,
+    queryFn: async () => (await supabase.from("vendor_applications").select("*").order("created_at", { ascending: false })).data ?? [],
+  });
+  const { data: logs = [] } = useQuery({
+    queryKey: ["admin-audit-logs"],
+    enabled: isAdmin,
+    queryFn: async () => (await supabase.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(200)).data ?? [],
+  });
+
   const updateOrderStatus = async (id: string, status: string) => {
     const { error } = await supabase.from("orders").update({ status }).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Order updated");
+    await logAudit({ actorId: user!.id, actorRole: "admin", action: "order.status_changed", entityType: "order", entityId: id, metadata: { status } });
     qc.invalidateQueries({ queryKey: ["admin-orders"] });
   };
 
@@ -69,6 +81,7 @@ function AdminPanel() {
     const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Booking updated");
+    await logAudit({ actorId: user!.id, actorRole: "admin", action: "booking.status_changed", entityType: "booking", entityId: id, metadata: { status } });
     qc.invalidateQueries({ queryKey: ["admin-bookings"] });
   };
 
@@ -76,6 +89,7 @@ function AdminPanel() {
     const { error } = await supabase.from("user_roles").insert({ user_id: userId, role });
     if (error) return toast.error(error.message);
     toast.success(`Granted ${role}`);
+    await logAudit({ actorId: user!.id, actorRole: "admin", action: "role.granted", entityType: "user", entityId: userId, metadata: { role } });
     qc.invalidateQueries({ queryKey: ["admin-users"] });
   };
 
@@ -83,13 +97,38 @@ function AdminPanel() {
     const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", role as any);
     if (error) return toast.error(error.message);
     toast.success("Revoked");
+    await logAudit({ actorId: user!.id, actorRole: "admin", action: "role.revoked", entityType: "user", entityId: userId, metadata: { role } });
     qc.invalidateQueries({ queryKey: ["admin-users"] });
   };
 
   const toggleProductActive = async (id: string, current: boolean) => {
     const { error } = await supabase.from("products").update({ is_active: !current }).eq("id", id);
     if (error) return toast.error(error.message);
+    await logAudit({ actorId: user!.id, actorRole: "admin", action: current ? "product.hidden" : "product.shown", entityType: "product", entityId: id });
     qc.invalidateQueries({ queryKey: ["admin-products"] });
+  };
+
+  const reviewApp = async (app: any, decision: "approved" | "rejected", notes: string) => {
+    const { error } = await supabase.from("vendor_applications").update({
+      status: decision,
+      admin_notes: notes || null,
+      reviewed_by: user!.id,
+      reviewed_at: new Date().toISOString(),
+    }).eq("id", app.id);
+    if (error) return toast.error(error.message);
+    if (decision === "approved") {
+      const { error: rErr } = await supabase.from("user_roles").insert({ user_id: app.user_id, role: "vendor" });
+      if (rErr && !rErr.message.includes("duplicate")) toast.error(rErr.message);
+    }
+    await logAudit({
+      actorId: user!.id, actorRole: "admin",
+      action: `vendor_application.${decision}`,
+      entityType: "vendor_application", entityId: app.id,
+      metadata: { user_id: app.user_id, business_name: app.business_name, notes },
+    });
+    toast.success(`Application ${decision}`);
+    qc.invalidateQueries({ queryKey: ["admin-vendor-apps"] });
+    qc.invalidateQueries({ queryKey: ["admin-users"] });
   };
 
   if (loading || rolesLoading) return null;
