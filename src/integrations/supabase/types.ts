@@ -411,6 +411,16 @@ export type Database = {
         }
         Returns: boolean
       }
+      log_audit: {
+        Args: {
+          _action: string
+          _actor_role?: string
+          _entity_id?: string
+          _entity_type?: string
+          _metadata?: Json
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "gardener" | "customer" | "vendor"
